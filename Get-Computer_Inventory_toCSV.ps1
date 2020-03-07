@@ -13,8 +13,22 @@
 .OUTPUTS
    This script exports a text file in column format, and as a CSV with headers.
    Format for output files is below:
+   
    "./ComputerInfo_yyyymmdd_HHMM.csv"
+   
+   Computer_Name,Serial_Number,Current_User,Manufacturer,Model,MAC_Address,Compliance_Status,IP_Address
+   Example-Comp1,2TK45784PJ,DOMAIN\jane.doe,HP,HP ProBook 650 G2,DE:AD:BE:EF:B5:BF,Patch KB4534276 Compliant,10.10.10.01
+   Example-comp2,2TK34684GQ,DOMAIN\john.doe,HP,HP ProBook 650 G2,DE:AD:BE:AF:00:70,Patch KB4534276 Compliant,10.10.10.02
+
    "./ComputerInfo_yyyymmdd_HHMM.txt"
+   _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+   IP Address   : 10.10.10.3
+   1 IP addresses found on this system
+   [+] Example-Comp3 | 2TK45784GP | DOMAIN\jose.gonzalez | Hewlett-Packard | HP ProDesk 600 G1
+   _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+   IP Address   : 10.10.10.4
+   1 IP addresses found on this system
+   [+] Example-Comp4 | 2TK45784GH | DOMAIN\bob.barker | HP | HP ProBook 650 G4
 .NOTES
    <add authors>
 .FUNCTIONALITY
