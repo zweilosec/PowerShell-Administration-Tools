@@ -1,3 +1,26 @@
+<#
+.Synopsis
+   Script for gathering computer inventory information.
+.DESCRIPTION
+   Script for gathering Computer_Name, Serial_Number, Current_User, Manufacturer, Model, MAC_Address, Compliance_Status, IP_Address
+   from computers in an Active Directory domain.
+.EXAMPLE
+   PS C:\Users\john.doe\Desktop> .\Get-Computer_Inventory_toCSV.ps1 COMPUTER_NAME
+.EXAMPLE
+   PS C:\Users\john.doe\Desktop> .\Get-Computer_Inventory_toCSV.ps1 .\Computers.txt
+.INPUTS
+   Input a list of computer names, either as an object or /n separated file.
+.OUTPUTS
+   This script exports a text file in column format, and as a CSV with headers.
+   Format for output files is below:
+   "./ComputerInfo_yyyymmdd_HHMM.csv"
+   "./ComputerInfo_yyyymmdd_HHMM.txt"
+.NOTES
+   <add authors>
+.FUNCTIONALITY
+   Computer inventory enumeration tool
+#>
+
 Param([string]$Computers)
 
 If (!$Computers) {
