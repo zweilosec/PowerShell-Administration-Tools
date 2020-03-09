@@ -1,10 +1,10 @@
 <#
       .SYNOPSIS
-      This powershell function gets information about the monitors attached to any computer. It uses EDID information provided by WMI. If this value is not specified it pulls the monitors of the computer that the script is being run on.
+      Srcipt for gathering inventory information about the monitors attached to networked computers. 
       .DESCRIPTION
-      The function begins by looping through each computer specified. For each computer it gets a list of monitors.
-      It then gets all of the necessary data from each monitor object and converts and cleans the data and places it in a custom PSObject. It then adds
-      the data to an array. At the end the array is displayed.
+      This script takes in a list of computer names, and for each computer retrieves a list of monitors.
+      If this value is not specified it pulls the monitors of the computer that the script is being run on.
+      It gathers SerialNumber, Manufacturer, and Model for each monitor saves it to a CSV file.
       .PARAMETER ComputerName
       Use this to specify the computer(s) which you'd like to retrieve information about monitors from.
       .EXAMPLE
@@ -24,6 +24,12 @@
       HP           HP Zbook 17 G5   8675311   TestName2 
       HP           HP Zbook 17 G5   8675311   TestName2
       HP           HP Zbook 17 G5   8675312   TestName3
+      .INPUTS
+      Input a list of computer names, either individually, as an object, or '/n' separated file.
+      .OUTPUTS
+      Outputs a CSV with headers. Naming convention for output files is "./MonitorInfo_yyyymmdd_HHMM.csv".
+      .FUNCTIONALITY
+      Computer monitor inventory enumeration tool
   #>
 
 
@@ -33,7 +39,7 @@
     [String[]]$ComputerName = $env:ComputerName
   )
   
-  #List of Manufacture Codes that could be pulled from WMI and their respective full names. Used for translating later down.
+  #List of Manufacture Codes that could be pulled from WMI and their respective full names. Used for readable output.
   $ManufacturerHash = @{ 
     "AAC" =	"AcerView";
     "ACR" = "Acer";
@@ -103,20 +109,20 @@
   
    $CSVLogFile = "./MonitorInfo_$(Get-Date -Format yyyymmdd_HHMM).csv"   
   
-  #Takes each computer specified and runs the following code:
+  #Take each computer specified and run the following code:
   ForEach ($Computer in $ComputerName) {
   
-    #Grabs the Monitor objects from WMI
+    #Grab the Monitor objects from WMI
     $Monitors = Get-WmiObject -Namespace "root\WMI" -Class "WMIMonitorID" -ComputerName $Computer -ErrorAction SilentlyContinue
     
-    #Creates an empty array to hold the data
+    #Create an empty array to hold the data
     $Monitor_Array = @()
     
     
-    #Takes each monitor object found and runs the following code:
+    #Take each monitor object found and runs the following code:
     ForEach ($Monitor in $Monitors) {
       
-      #Grabs respective data and converts it from ASCII encoding and removes any trailing ASCII null values
+      #Grab respective data and converts it from ASCII encoding and removes any trailing ASCII null values
       If ([System.Text.Encoding]::ASCII.GetString($Monitor.UserFriendlyName) -ne $null) {
         $Mon_Model = ([System.Text.Encoding]::ASCII.GetString($Monitor.UserFriendlyName)).Replace("$([char]0x0000)","")
       } else {
@@ -126,16 +132,20 @@
       $Mon_Attached_Computer = ($Monitor.PSComputerName).Replace("$([char]0x0000)","")
       $Mon_Manufacturer = ([System.Text.Encoding]::ASCII.GetString($Monitor.ManufacturerName)).Replace("$([char]0x0000)","")
       
-      #Filters out "non monitors". Place any of your own filters here. These two are all-in-one computers with built in displays that we don't need the info from.
+      <#
+      Filter out "non monitors" such as laptop displays. Place any of your own filters here. 
+      Below examples are all-in-one computers with built in displays that we don't need the info from.
+      Remove '#' from the code below to use this filter.
+      #>
 #      If ($Mon_Model -like "*800 AIO*" -or $Mon_Model -like "*8300 AiO*") {Break}
       
-      #Sets a friendly name based on the hash table above. If no entry found sets it to the original 3 character code
+      #Set a friendly name based on the hash table above. If no entry found leaves it set to the original 3 character code.
       $Mon_Manufacturer_Friendly = $ManufacturerHash.$Mon_Manufacturer
       If ($Mon_Manufacturer_Friendly -eq $null) {
         $Mon_Manufacturer_Friendly = $Mon_Manufacturer
       }
       
-      #Creates a custom monitor object and fills it with 4 NoteProperty members and the respective data
+      #Create a custom monitor object and fill it with the needed four properties with the respective data pulled from WMI.
       $Monitor_Obj = [PSCustomObject]@{
         Manufacturer     = $Mon_Manufacturer_Friendly
         Model            = $Mon_Model
@@ -143,14 +153,14 @@
         AttachedComputer = $Mon_Attached_Computer
       }
       
-      #Appends the object to the array
+      #Append the object to the array
       $Monitor_Array += $Monitor_Obj
 
-    } #End ForEach Monitor
+    } #End ForEach $Monitor
   
-    #Outputs the Array
+    #Output to CSV
     $Monitor_Array | Select AttachedComputer,SerialNumber,Manufacturer,Model |
                Export-Csv -Append $CSVLogFile -NoTypeInformation
     $Monitor_Array
     
-} #End ForEach Computer
+} #End ForEach $Computer
