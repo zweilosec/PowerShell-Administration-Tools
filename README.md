@@ -15,5 +15,7 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 | [Get-User\_Profile](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-User_Profile.ps1) | Searches a domain for the user ID specified.  Returns a list of all of the computers that user has signed into. |
 | [Add-Printer](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/add-printer.ps1) | Adds a printer to the computer specified \(by computer name\).  Requires some information such as printer IP, Driver long name, and the name you want the printer to be displayed as. |
 
+#### More content from Zweilosec:
 
+## [OSCP prep and CTF notes](https://zweilosec.gitbook.io/hackers-rest/)
 
