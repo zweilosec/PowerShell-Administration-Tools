@@ -19,3 +19,6 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 
 ## [OSCP prep and CTF notes](https://zweilosec.gitbook.io/hackers-rest/)
 
+  
+If you like this content and would like to see more, please consider supporting me through Patreon at [https://www.patreon.com/zweilosec](https://www.patreon.com/zweilosec).
+
