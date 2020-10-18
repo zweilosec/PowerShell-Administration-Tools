@@ -14,6 +14,7 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 | [Get-Monitor\_Inventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-Monitor_Inventory.ps1) | Searches a domain for the computers specified \(by computer name\) and reports a list of inventory-related information for the attached Monitors. Make, Model, Serial |
 | [Get-User\_Profile](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-User_Profile.ps1) | Searches a domain for the user ID specified.  Returns a list of all of the computers that user has signed into. |
 | [Add-Printer](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/add-printer.ps1) | Adds a printer to the computer specified \(by computer name\).  Requires some information such as printer IP, Driver long name, and the name you want the printer to be displayed as. |
+| [Renew-DHCP](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Renew-DHCP.ps1) | Releases DHCP reservations for all active interfaces and renews them. Fully PowerShell equivilent to running `ipconfig /release; ipconfig /renew`.
 
 #### More content from Zweilosec:
 
@@ -21,4 +22,3 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 
   
 If you like this content and would like to see more, please consider supporting me through Patreon at [https://www.patreon.com/zweilosec](https://www.patreon.com/zweilosec).
-
