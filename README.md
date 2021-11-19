@@ -10,6 +10,7 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 
 | Script Name | Description |
 | :--- | :--- |
+| [Clear-ExcessCertificates](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Clear-ExcessCertificates.ps1) | Clears all PIV certificates from the local store except for the current user's |
 | [Create-ADUserFromCsv](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Create-ADUserFromCsv.ps1) | Batch creates users in Active Directory from a .csv file. |
 | [Get-Computer\_Inventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-Computer_Inventory_toCSV.ps1) | Searches a domain for the computers specified \(by computer name\) and reports a list of inventory-related information for those computers.  IP, MAC, Make, Model, Serial, and Last User. |
 | [Get-Monitor\_Inventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-Monitor_Inventory.ps1) | Searches a domain for the computers specified \(by computer name\) and reports a list of inventory-related information for the attached Monitors. Make, Model, Serial |
