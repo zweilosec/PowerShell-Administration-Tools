@@ -1,14 +1,37 @@
 <#
-Simple TCP Port scanner.
+.SYNOPSIS
+  Simple TCP Port scanner.
 
-Takes in a comma separated list of IPs, and of ports. An output file can be specified as well.
-Usage: Scan-TCPPorts <hosts> <ports> -outfile <file_name>
+.INPUTS
+  Takes in a comma separated list of IPs, and of ports. An output file can be specified as well.
+  Usage: Scan-TCPPorts <hosts> <ports> -outfile <file_name>
 
-Outputs results to a csv file with IP,Protocol,Port,Result headers.
+.OUTPUTS
+  Outputs results to a csv file with IP, Protocol, Port & Result headers.
 
-Author: Beery, Christopher
-Created: 19 Nov 2021
-Last Modified: 20 Nov 2021
+.NOTES
+  Author: Beery, Christopher
+  Created: 19 Nov 2021
+  Last Modified: 20 Nov 2021
+
+.EXAMPLE
+  Scan single port on single IP:
+  Scan-TCPPorts 10.10.10.123 137
+
+  Scan multiple ports on a single IP:
+  Scan-TCPPorts 10.10.10.123 (135,137,445)
+
+  Scan a port list and ip list from files
+  Scan-TCPPorts (cat ./ip_list.txt) (cat ./port_list.txt)
+  
+  Cheats to scan subnets:
+
+  Scan class C subnet:
+  0..255 | Foreach { Scan-TCPPorts 10.10.10.$_ (135,137,139,445) }
+
+  Scan entire class B subnet:
+  $subnet = (0..255) | % { 0..255 | Foreach { Scan-TCPPorts 10.10.$subnet.$_ (80,443) }}
+  (Better to scan for live hosts first then scan for ports separately!)
 #>
 
 Function Scan-TCPPorts 
