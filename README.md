@@ -20,6 +20,7 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 ## Network Tools
 | Script Name | Description |
 | :--- | :--- |
+| [Get-OpenPortsWithProcess](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Network/Get-OpenPortsWithProcess.ps1) | A simple script for listing open TCP or UDP ports. <br>Has three options: <br>* `-TCP` : show TCP ports<br>* `-UDP` : show UDP ports<br>* `-Listening` :  Show only listening ports |
 | [Renew-DHCP](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Network/Renew-DHCP.ps1) | Releases DHCP reservations for all active interfaces and renews them. Fully PowerShell equivilent to running `ipconfig /release; ipconfig /renew`. |
 |[Scan-TCPPorts](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Network/Scan-TCPPorts.ps1) | A simple TCP port scanner. Takes in a comma separated list of IPs, and of ports. An output file (csv or txt) can be specified as well. |
 
