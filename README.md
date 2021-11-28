@@ -24,9 +24,17 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 | [Renew-DHCP](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Network/Renew-DHCP.ps1) | Releases DHCP reservations for all active interfaces and renews them. Fully PowerShell equivilent to running `ipconfig /release; ipconfig /renew`. |
 |[Scan-TCPPorts](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Network/Scan-TCPPorts.ps1) | A simple TCP port scanner. Takes in a comma separated list of IPs, and of ports. An output file (csv or txt) can be specified as well. |
 
+## Snippets
+Drop these snippets into your scripts to add this functionality. May need to modify variables to fit your use cases.
+
+| Script Name | Description |
+| :--- | :--- |
+| [Run-ADPreChecks](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Snippets/Run-ADPreChecks.ps1) |Code snippet to do some preliminary checks to ensure a script will function<br>Checks for: administrator privileges, PowerShell v5 or greater, and the ActiveDirectory PowerShell modules |
+| [Select-FileWithDialog](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Snippets/Select-FileWithDialog.ps1) | Code snippet to display an Explorer window to select a file (.csv and .txt in this example) |
+
 #### More content from Zweilosec:
 
 ## [OSCP prep and CTF notes](https://zweilosec.gitbook.io/hackers-rest/)
 
   
-If you like this content and would like to see more, please consider supporting me through Patreon at [https://www.patreon.com/zweilosec](https://www.patreon.com/zweilosec).
+If you like this content and would like to see more, please consider [buying me a coffee](https://www.buymeacoffee.com/zweilosec)!
