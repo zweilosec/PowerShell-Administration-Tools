@@ -1,20 +1,20 @@
 <#
-      .SYNOPSIS
-      Srcipt for gathering inventory information about the monitors attached to networked computers. 
-      .DESCRIPTION
-      This script takes in a list of computer names, and for each computer retrieves a list of monitors.
+.SYNOPSIS
+  Srcipt for gathering inventory information about the monitors attached to networked computers. 
+.DESCRIPTION
+     This script takes in a list of computer names, and for each computer retrieves a list of monitors.
       If this value is not specified it pulls the monitors of the computer that the script is being run on.
       It gathers SerialNumber, Manufacturer, and Model for each monitor saves it to a CSV file.
-      .PARAMETER ComputerName
+.PARAMETER ComputerName
       Use this to specify the computer(s) which you'd like to retrieve information about monitors from.
-      .EXAMPLE
+.EXAMPLE
       PS C:/> Get-Monitor.ps1 -ComputerName TestName
       Manufacturer Model    	SerialNumber AttachedComputer
       ------------ -----    	------------ ----------------
       HP           HP Zbook 17 G5 8675309    TestName 
       HP           HP Zbook 17 G5 8675309    TestName 
       HP           HP Zbook 17 G5 8675309    TestName
-      .EXAMPLE
+.EXAMPLE
       PS C:/> $Computers = @("TestName1","TestName2","TestName3")
       PS C:/> Get-Monitor.ps1 -ComputerName $Computers
       Manufacturer Model      	SerialNumber AttachedComputer
@@ -24,13 +24,17 @@
       HP           HP Zbook 17 G5   8675311   TestName2 
       HP           HP Zbook 17 G5   8675311   TestName2
       HP           HP Zbook 17 G5   8675312   TestName3
-      .INPUTS
+.INPUTS
       Input a list of computer names, either individually, as an object, or '/n' separated file.
-      .OUTPUTS
+.OUTPUTS
       Outputs a CSV with headers. Naming convention for output files is "./MonitorInfo_yyyymmdd_HHMM.csv".
-      .FUNCTIONALITY
+.FUNCTIONALITY
       Computer monitor inventory enumeration tool
-  #>
+.NOTES
+  Authors: Beery, Christopher (https://github.com/zweilosec) & Winchester, Cassius (https://github.com/cassiuswinchester)
+  Created: 6 Mar 2020
+  Last Modified: 30 Nov 2021
+#>
 
 
   [CmdletBinding()]
@@ -40,6 +44,7 @@
   )
   
   #List of Manufacture Codes that could be pulled from WMI and their respective full names. Used for readable output.
+  #Get updated list here: https://www.lansweeper.com/knowledgebase/list-of-3-letter-monitor-manufacturer-codes/
   $ManufacturerHash = @{ 
     "AAC" =	"AcerView";
     "ACR" = "Acer";
@@ -112,14 +117,13 @@
   #Take each computer specified and run the following code:
   ForEach ($Computer in $ComputerName) {
   
-    #Grab the Monitor objects from WMI
+    #Grab the Monitor objects from WMI for each remote computer
     $Monitors = Get-WmiObject -Namespace "root\WMI" -Class "WMIMonitorID" -ComputerName $Computer -ErrorAction SilentlyContinue
     
-    #Create an empty array to hold the data
+    #An empty array to hold the data
     $Monitor_Array = @()
-    
-    
-    #Take each monitor object found and runs the following code:
+   
+    #Take each monitor object found and pull the required properties:
     ForEach ($Monitor in $Monitors) {
       
       #Grab respective data and converts it from ASCII encoding and removes any trailing ASCII null values
@@ -133,8 +137,8 @@
       $Mon_Manufacturer = ([System.Text.Encoding]::ASCII.GetString($Monitor.ManufacturerName)).Replace("$([char]0x0000)","")
       
       <#
-      Filter out "non monitors" such as laptop displays. Place any of your own filters here. 
-      Below examples are all-in-one computers with built in displays that we don't need the info from.
+      Filter out "non monitors" such as laptop displays. Place any of your own filters here as needed. 
+      Below examples are all-in-one computers with built in displays that we didn't need the info from.
       Remove '#' from the code below to use this filter.
       #>
 #      If ($Mon_Model -like "*800 AIO*" -or $Mon_Model -like "*8300 AiO*") {Break}
