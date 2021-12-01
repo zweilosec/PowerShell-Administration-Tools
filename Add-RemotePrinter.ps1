@@ -24,7 +24,7 @@
   "ZWEILOSCOMP01", "ZWEILOSCOMP02" | Add-RemotePrinter -Domain zweilos.local -User zweilosec -IP 10.10.10.244 -Name "Office Printer" -Driver "HP Universal Printing PCL 6"
   Add the printer "Office Printer" to all the computers specified prior to pipe (can take any list of piped-in computernames)  
 .Notes
-  Author: Beery, Christopher
+  Author: Beery, Christopher (https://github.com/zweilosec)
   Created: 6 Mar 2020
   Last Modified: 27 Nov 2021
   Useful links:
