@@ -30,7 +30,9 @@
    1 IP addresses found on this system
    [+] Example-Comp4 | 2TK45784GH | DOMAIN\bob.barker | HP | HP ProBook 650 G4
 .NOTES
-   <add authors>
+  Authors: Beery, Christopher (https://github.com/zweilosec) & Winchester, Cassius (https://github.com/cassiuswinchester)
+  Created: 6 Mar 2020
+  Last Modified: 30 Nov 2021
 .FUNCTIONALITY
    Computer inventory enumeration tool
 #>
