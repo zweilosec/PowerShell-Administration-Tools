@@ -13,7 +13,7 @@
 
    AccountExpirationDate,Enabled,EmailAddress,Name,DisplayName,UserPrincipalName,SamAccountName,GivenName,Surname,Path
 
-   Author: Beery, Christopher
+   Author: Beery, Christopher (https://github.com/zweilosec)
    Created: 18 Nov 2021
    Last modified: 19 Nov 2021
 #>
