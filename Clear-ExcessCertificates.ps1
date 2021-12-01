@@ -1,12 +1,13 @@
 <#
 .Description
-   This script clears all PIV certificates from the local store except for the current user's
-   The current iteration of this script relies on the user to enter their name.
-   There are ways to automate this, however current environment precludes this. 
-   The easiest way would be to pull the current username from $env:username
-   
-   Created: 15 Nov 2021
-   Last Modified: 19 Nov 2021
+  This script clears all PIV certificates from the local store except for the current user's
+  The current iteration of this script relies on the user to enter their name.
+  There are ways to automate this, however current environment precludes this. 
+  The easiest way would be to pull the current username from $env:username
+.Notes
+  Author: Beery, Christopher (https://github.com/zweilosec)
+  Created: 15 Nov 2021
+  Last Modified: 30 Nov 2021
 #>
 
 #used to check the user's confirmation
