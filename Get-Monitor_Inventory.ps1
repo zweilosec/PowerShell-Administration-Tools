@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Srcipt for gathering inventory information about the monitors attached to networked computers. 
+  Script for gathering inventory information about the monitors attached to networked computers. 
 .DESCRIPTION
      This script takes in a list of computer names, and for each computer retrieves a list of monitors.
       If this value is not specified it pulls the monitors of the computer that the script is being run on.
