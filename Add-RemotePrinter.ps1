@@ -6,12 +6,12 @@
   Will prompt for credentials for each computer that is remoted into.
 .Inputs
   Mandatory Arguments:
-  -ComputerName : A list or single ComputerName or IP. Can be piped into this command.
+  -ComputerName : A list or single ComputerName(s) or IP(s). Can be piped into this script.
   -Domain : Domain name of the user account being used
   -UserName : Username for account being used to remote into the computer
-  -IP : IP of the printer to add
+  -PrinterHostAddress : IP of the printer to add
   -PrinterName : Windows display name for the printer
-  -Driver : Full name of the driver to install for the printer
+  -DriverName : Full name of the driver to install for the printer
 
   Optional Arguments:
   -PortName : Name of the printer port that will be added. If a printer port name is not specified, will use the printer IP [default].
@@ -55,6 +55,7 @@ $UserName,
 [Parameter(Mandatory,
            HelpMessage="Enter a domain to log into the remote computer.",
            ParameterSetName="User")]
+[Alias('Domain')]
 [string]
 $DomainName,
 
@@ -63,17 +64,19 @@ $DomainName,
            ParameterSetName="Printer")]
 [Alias('IP')]
 [string]
-$PrinterIp,
+$PrinterHostAddress,
 
 [Parameter(Mandatory,
            HelpMessage="Enter the full name of the printer driver.",
            ParameterSetName="Printer")]
+[Alias('Driver')]
 [string]
-$FullDriverName,
+$DriverName,
 
 [Parameter(Mandatory,
            HelpMessage="Enter the name you wish to be displayed for the printer.",
            ParameterSetName="Printer")]
+[Alias('PrinterName')]
 [string]
 $WindowsDisplayName,   
     
@@ -104,9 +107,9 @@ Process
         $session = New-PSSession -ComputerName $computer -Credential $DomainName\$UserName #will prompt for credentials for each computer
 
         Write-Verbose "Adding printer {0} to {1}." -f $WindowsDisplayName, $computer
-        Invoke-Command -Session $session {Add-PrinterPort -Name $PortName -PrinterHostAddress $PrinterIp}
-        Invoke-Command -Session $session {Add-PrinterDriver -Name "$FullDriverName"}
-        Invoke-Command -Session $session {Add-Printer -Name "$WindowsDisplayName" -PortName $PortName -DriverName "$FullDriverName"}
+        Invoke-Command -Session $session {Add-PrinterPort -Name $PortName -PrinterHostAddress $PrinterHostAddress}
+        Invoke-Command -Session $session {Add-PrinterDriver -Name "$DriverName"}
+        Invoke-Command -Session $session {Add-Printer -Name "$WindowsDisplayName" -PortName $PortName -DriverName "$DriverName"}
         Invoke-Command -Session $session {Write-Output "Printer Added Successfully."}
 
         Print-Verbose "Closing remote session."
