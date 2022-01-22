@@ -28,7 +28,7 @@
 .Notes
   Author: Beery, Christopher (https://github.com/zweilosec)
   Created: 6 Mar 2020
-  Last Modified: 16 Jan 2022
+  Last Modified: 21 Jan 2022
   Useful links:
   https://info.sapien.com/index.php/scripting/scripting-how-tos/take-values-from-the-pipeline-in-powershell
   https://jeffbrown.tech/how-to-write-awesome-functions-with-powershell-parameter-sets/
@@ -89,24 +89,24 @@ $PortName
 
 Begin
 {
-    
+    #If a portname is not specified will use the printer's IP instead.  
     if (-not ($PortName))
     {
-        Write-Verbose "Port name not specified.  Using {0} instead." -f $PrinterIP
+        Write-Verbose "Port name not specified.  Using $PrinterIP instead."
         $PortName = $PrinterIP
     }
-
+    #Initialize internal variables
     $ComputerCount = 0
 }
 
-
 Process
 {
-    Foreach ( $computer in $ComputerName) {
+    Foreach ( $computer in $ComputerName ) 
+    {
         Write-Verbose "Creating a remote session with $computer"
         $session = New-PSSession -ComputerName $computer -Credential $DomainName\$UserName #will prompt for credentials for each computer
 
-        Write-Verbose "Adding printer {0} to {1}." -f $WindowsDisplayName, $computer
+        Write-Verbose "Adding printer $WindowsDisplayName to $computer."
         Invoke-Command -Session $session {Add-PrinterPort -Name $PortName -PrinterHostAddress $PrinterHostAddress}
         Invoke-Command -Session $session {Add-PrinterDriver -Name "$DriverName"}
         Invoke-Command -Session $session {Add-Printer -Name "$WindowsDisplayName" -PortName $PortName -DriverName "$DriverName"}
@@ -122,5 +122,5 @@ Process
 
 End
 {
-    Write-Verbose "Printer {0} added to {1} computers." -f $WindowsDisplayName, $ComputerCount
+    Write-Verbose "Printer $WindowsDisplayName added to $ComputerCount computers."
 }
