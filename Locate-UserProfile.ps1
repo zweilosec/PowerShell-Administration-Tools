@@ -4,8 +4,9 @@
 .DESCRIPTION
    Script for gathering the machines that a user has signed into from a list of computers.
    Displays the Computer Name, User Home Folder, and Last Logged-in Time for each computer. 
-   Each user specified will have a separate CSV log file created.
-   Requires the WinRM service to be running, however does not require admin rights.
+   Write output to a CSV log file.
+   Requires the WinRM service to be running on each remote computer, however works locally without.
+   Does not require admin rights.
 .EXAMPLE
    Locate-UserProfile.ps1 -ComputerName Example-Comp1 -UserName Zweilosec -Verbose
 .EXAMPLE
@@ -22,17 +23,16 @@
    This script exports a report in table format, and as a CSV file with headers.
    Example output is below:
 
-    Searching for user profile Zweilosec...
+    Searching for user profile zweiline...
 
     User profile Zweilosec was found on 4 computers.
 
-
-    PSComputerName LocalPath          LastUseTime
-    -------------- ---------          -----------
-    Zweildesk-1    C:\Users\Zweilosec 1/22/2022 14:08:08
-    Zweildesk-2    C:\Users\Zweilosec 1/22/2022 14:08:08
-    Zweildesk-3    C:\Users\Zweilosec 1/22/2022 14:08:28
-    Zweildesk-4    C:\Users\Zweilosec 1/22/2022 14:08:28
+    User     ComputerName UserHome          LastUseTime
+    ----     ------------ --------          -----------
+    zweiline Zweildesk-1  C:\Users\zweiline 1/22/2022 20:34:09
+    zweiline Zweildesk-2  C:\Users\zweiline 1/22/2022 20:34:09
+    zweiline Zweildesk-3  C:\zweiline       1/22/2022 14:08:28
+    zweiline Zweildesk-4  C:\zweiline       1/22/2022 14:08:28
 
 .NOTES
    Author: Beery, Christopher (https://github.com/zweilosec)
@@ -67,58 +67,71 @@ Param
 
 Process
 {
-    Foreach ( $USER in $UserName )
-    {
-        #The CSV file to be used as a log is defined here
-        $TimeStamp = (Get-Date).ToString('yyyy-MM-dd_HHmm')
-        $CsvFile = "./$($User)-ProfileSearch_$($TimeStamp).csv"
+    #The CSV file to be used as a log is defined here
+    $TimeStamp = (Get-Date).ToString('yyyy-MM-dd_HHmm')
+    $CsvFile = "./ProfileSearch_$($TimeStamp).csv"
+    Write-Host ""
 
-        Write-Host "`nSearching for user profile $USER..."
+    Foreach ( $User in $UserName )
+    {
+        Write-Host "Searching for user profile $User..."
+        #Count the number of computers the user has logged into, reset to 0 for each user
+        $ComputerCount = 0
 
         #These are the commands that will be run on each computer
         Foreach ( $Computer in $ComputerName ) 
         {
-            #Get the user's SID because the Win32_UserProfile (for localpath) has no Name property
-            $SID = (Get-CimInstance -ClassName Win32_UserAccount -ComputerName $Computer | 
-            Where-Object Name -EQ "$USER").SID
-            
-            #Get the user's $Home directory
+            $RemoteComputer = $Computer
+            #First, check if we are scanning the local machine
+            #Setting the -ComputerName property of Get-CIMInstance to $null will allow you 
+            # to scan a local machine without WinRM enabled
+            if ( $Computer -eq $($env:COMPUTERNAME) )
+            {
+                $RemoteComputer = $null
+            }
+
+            #Get the user's SID because the Win32_UserProfile (for RemoteProfile) has no Name property
+            $SID = (Get-CimInstance -ClassName Win32_UserAccount -ComputerName $RemoteComputer | 
+            Where-Object Name -EQ "$User").SID
+
             #This method was used since we cannot assume the user's home folder is in C:\Users\
-            $LocalPath = (Get-CimInstance -ClassName Win32_UserProfile | 
-            Where-Object SID -EQ "$SID").LocalPath
+            $RemoteProfile = (Get-CimInstance -ClassName Win32_UserProfile -ComputerName $RemoteComputer | 
+            Where-Object SID -EQ "$SID")
 
-            #Get the last time the user logged in
-            $LastUseTime = (Get-CimInstance -ClassName Win32_UserProfile -ComputerName $Computer | 
-            Where-Object LocalPath -EQ $LocalPath).LastUseTime
-
-            #The results will be stored in a custom object with these three properties
+            #The results will be stored in a custom object with these four properties
             $UserProfile = [PSCustomObject]@{
+                User = $User
                 ComputerName = $Computer
-                UserHome = $LocalPath
-                LastUseTime = $LastUseTime
+                UserHome = $RemoteProfile.LocalPath
+                LastUseTime = $RemoteProfile.LastUseTime
             }
 
             #If the User's home directory exists, then the user has signed in
-            $ProfileFound = $UserProfile | Where-Object UserHome
-            
-            #Writes the results to a CSV file
-            $ProfileFound | Select-Object ComputerName, UserHome, LastUseTime |
-            Export-Csv -Path $CsvFile -Append -NoTypeInformation
+            if ( $UserProfile.UserHome )
+            {            
+                #Writes the results to a CSV file
+                $UserProfile | Select-Object User, ComputerName, UserHome, LastUseTime |
+                Export-Csv -Path $CsvFile -Append -NoTypeInformation
+                
+                #For each computer where a profile is found, increment ComputerCount
+                $ComputerCount ++
+            }
         }
 
-        if ($ProfileFound) 
+        if ( $ComputerCount -gt 0 ) 
         {
-            #Read results from the CSV file
-            $output = Import-Csv -Path $CsvFile
-            #Count number of lines
-            $ComputerCount = $output.Count
-            #Write results to the terminal
-            Write-Host "`nUser profile $USER was found on $ComputerCount computers.`n" -ForegroundColor Green
-            Write-Output $output
+            Write-Host "`nUser profile $User was found on $ComputerCount computers.`n" -ForegroundColor Green
         }
         else 
         {
-            Write-Host "`nUser profile $USER was not found.`n" -ForegroundColor Red
+            Write-Host "`nUser profile $User was not found.`n" -ForegroundColor Red
         }
     }
+}
+
+End
+{
+    #Read results from the CSV file and print to the screen
+    $output = Import-Csv -Path $CsvFile
+    Write-Output $output       
 }
