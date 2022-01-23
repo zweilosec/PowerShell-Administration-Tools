@@ -6,6 +6,7 @@
    Displays the Computer Name, User Home Folder, and Last Logged-in Time for each computer. 
    Write output to a CSV log file.
    Requires the WinRM service to be running on each remote computer, however works locally without.
+   To scan a remote machine without WinRM, use the -DCOM flag.
    Does not require admin rights.
 .EXAMPLE
    Locate-UserProfile.ps1 -ComputerName Example-Comp1 -UserName Zweilosec -Verbose
@@ -19,6 +20,9 @@
 
    -ComputerName <computer name>
    Input a list of computer names, either piped in as an object or a text file file with one computer name per line.
+
+   -DCOM
+   Instructs the script to use DCOM instead of WinRM.  Does nothing if scanning the localhost.
 .OUTPUTS
    This script exports a report in table format, and as a CSV file with headers.
    Example output is below:
@@ -62,7 +66,11 @@ Param
                 ValueFromPipelineByPropertyName=$true)]
     [Alias("Name")] #Needed to allow computers to be piped in as an attribute from Get-ADComputer
     [String[]]
-    $ComputerName
+    $ComputerName, 
+
+    [Alias('NoWinRM')]
+    [Switch]
+    $DCOM = $false
 )
 
 Process
@@ -81,7 +89,11 @@ Process
         #These are the commands that will be run on each computer
         Foreach ( $Computer in $ComputerName ) 
         {
+            #Parameter list that will be fed to Get-CimInstance
+            $CimParameters = @{}
+            #Hack to get around setting $Computer to $null if scanning localhost
             $RemoteComputer = $Computer
+
             #First, check if we are scanning the local machine
             #Setting the -ComputerName property of Get-CIMInstance to $null will allow you 
             # to scan a local machine without WinRM enabled
@@ -90,12 +102,26 @@ Process
                 $RemoteComputer = $null
             }
 
-            #Get the user's SID because the Win32_UserProfile (for RemoteProfile) has no Name property
-            $SID = (Get-CimInstance -ClassName Win32_UserAccount -ComputerName $RemoteComputer | 
+            #If the user wants to use DCOM instead of WinRM, enable this
+            #Do not use this branch if scanning local computer because will cause errors and not needed
+            if ( $DCOM -and $RemoteComputer )
+            {
+                $SessionOption = New-CimSessionOption -Protocol Dcom
+                #Create the remote CIM session and add to CimParameters
+                $RemoteSession = New-CimSession -ComputerName $RemoteComputer -SessionOption $SessionOption
+                $CimParameters = @{CimSession = $RemoteSession}
+            }
+            else 
+            {
+                $CimParameters = @{ComputerName = $RemoteComputer}
+            }
+
+            #Get the user's SID because the Win32_UserProfile Class (for $RemoteProfile) has no Name property
+            $SID = (Get-CimInstance -ClassName Win32_UserAccount @CimParameters | 
             Where-Object Name -EQ "$User").SID
 
             #This method was used since we cannot assume the user's home folder is in C:\Users\
-            $RemoteProfile = (Get-CimInstance -ClassName Win32_UserProfile -ComputerName $RemoteComputer | 
+            $RemoteProfile = (Get-CimInstance -ClassName Win32_UserProfile @CimParameters | 
             Where-Object SID -EQ "$SID")
 
             #The results will be stored in a custom object with these four properties
@@ -115,6 +141,12 @@ Process
                 
                 #For each computer where a profile is found, increment ComputerCount
                 $ComputerCount ++
+            }
+            
+            #Close the remote CimSession if created
+            if ($RemoteSession)
+            {
+                Remove-CimSession $RemoteSession
             }
         }
 
