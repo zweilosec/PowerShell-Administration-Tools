@@ -29,7 +29,7 @@
 
     Searching for user profile zweiline...
 
-    User profile Zweilosec was found on 4 computers.
+    User profile zweiline was found on 4 computers.
 
     User     ComputerName UserHome          LastUseTime
     ----     ------------ --------          -----------
@@ -117,20 +117,19 @@ Process
             }
 
             #Get the user's SID because the Win32_UserProfile Class (for $RemoteProfile) has no Name property
-            $SID = (Get-CimInstance -ClassName Win32_UserAccount @CimParameters | 
-            Where-Object Name -EQ "$User").SID
+            # -Filter is faster than piping to Where-Object; Double-double quotes needed to quote the variable properly
+            $SID = (Get-CimInstance -ClassName Win32_UserAccount @CimParameters -Filter "Name = ""$User""").SID
 
             #This method was used since we cannot assume the user's home folder is in C:\Users\
-            $RemoteProfile = (Get-CimInstance -ClassName Win32_UserProfile @CimParameters | 
-            Where-Object SID -EQ "$SID")
+            $RemoteProfile = (Get-CimInstance -ClassName Win32_UserProfile @CimParameters -Filter "SID = ""$SID""")
 
             #The results will be stored in a custom object with these four properties
-            $UserProfile = [PSCustomObject]@{
+            $UserProfile = [PSCustomObject]::new(@{
                 User = $User
                 ComputerName = $Computer
                 UserHome = $RemoteProfile.LocalPath
                 LastUseTime = $RemoteProfile.LastUseTime
-            }
+            })
 
             #If the User's home directory exists, then the user has signed in
             if ( $UserProfile.UserHome )
