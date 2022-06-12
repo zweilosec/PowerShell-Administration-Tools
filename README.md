@@ -16,6 +16,7 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 | [Get-Monitor\_Inventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-Monitor_Inventory.ps1) | Searches a domain for the computers specified \(by computer name\) and reports a list of inventory-related information for the attached Monitors. Make, Model, Serial |
 | [Locate-UserProfile](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Locate-UserProfile.ps1) | Searches a domain for the user ID specified.  Returns a list of all of the computers that user has signed into, their $home folder, and the last time they logged in. Saves output in a CSV file. |
 | [Add-RemotePrinter](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Add-RemotePrinter.ps1) | Adds a printer to the computer specified \(by computer name\).  Requires some information such as printer IP, Driver long name, and the name you want the printer to be displayed as. |
+| [Get-SoftwareInventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-SoftwareInventory.ps1) | Outputs a list of software installed on the target computer from the registry. Lists ComputerName, Software DisplayName, Version, and Publisher. |
 
 ## Network Tools
 | Script Name | Description |
