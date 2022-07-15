@@ -6,11 +6,7 @@ function New-Shortcut
    .DESCRIPTION
       PowerShell script for creating Windows shortcut files (.lnk).  
    .EXAMPLE
-      Locate-UserProfile.ps1 -ComputerName Example-Comp1 -UserName Zweilosec -Verbose
-   .EXAMPLE
-      Locate-UserProfile.ps1 -UserName Zweilosec .\Computers.txt 
-   .EXAMPLE
-      Get-ADComputer -Filter * -SearchBase "OU=TestOU,DC=TestDomain,DC=com" | Select -Property Name | Locate-UserProfile.ps1 -UserName Zweilosec
+      New-Shortcut -TargetPath C:\Windows\notepad.exe -OutputLink $env:userprofile\Desktop\notepad.lnk
    .INPUTS
       -TargetPath <file_to_execute>
       The target to create the link to. Enter the full path (Ex: C:Windows\system32\notepad.exe)
@@ -40,7 +36,7 @@ function New-Shortcut
    .NOTES
       Author: Beery, Christopher (https://github.com/zweilosec)
       Created: 14 Jul 2022
-      Last Modified: 14 Jul 2022
+      Last Modified: 15 Jul 2022
       Useful Study Links:
       * http://powershellblogger.com/2016/01/create-shortcuts-lnk-or-url-files-with-powershell/
       * https://docs.microsoft.com/en-us/powershell/scripting/samples/creating-.net-and-com-objects--new-object-?view=powershell-7.2
@@ -71,7 +67,7 @@ function New-Shortcut
    
       [Parameter(Mandatory=$false)]
       [String]
-      $IconLocation = "C:\windows\System32\SHELL32.dll,70", #default to blank text file icon (70)
+      $IconLocation = "$TargetPath,0", #"C:\windows\System32\SHELL32.dll,70", default to targets icon, shell32(70) is text file icon
       
       [Parameter(Mandatory=$false)]
       [Int]
@@ -82,7 +78,7 @@ function New-Shortcut
    
       [Parameter(Mandatory=$false)]
       [String]
-      $Description = "A new shortcut",
+      $Description = "Shortcut to $TargetPath",
    
       [Parameter(Mandatory=$false)]
       [String]
@@ -108,14 +104,30 @@ function New-Shortcut
    $ShortCut.Description = $Description
    $ShortCut.Hotkey = $Hotkey
 
+   if ($(Test-Path $OutputLink)) #If the .lnk already exists
+   {
+      Write-Output "The target link already exists."
+      $DeleteLink = Read-Host "Delete the existing link? [y/n]: "
+      if ($DeleteLink.ToLower() -eq 'y')
+      {
+         Remove-Item $OutputLink
+      }
+   }
+
    $Shortcut.Save()
 
+   # Optional if you want to make the link hidden (to prevent user clicks)
    if ($Hidden)
    {
-      (Get-Item $OutputLink).Attributes += 'Hidden' # Optional if you want to make the link hidden (to prevent user clicks)
+      If ((Get-ItemProperty $OutputLink) -and [System.IO.FileAttributes]::Hidden)
+      {
+         #Write-Output "The file is hidden already"
+         break
+      }
+      (Get-Item $OutputLink).Attributes += 'Hidden' 
    }
    
-   ### Below is the code to set shortcut to "Run As Administrator" (optional)
+   # Below is the code to set shortcut to "Run As Administrator" (optional)
    If ($AsAdmin)
    {
       $bytes = [System.IO.File]::ReadAllBytes($OutputLink)
