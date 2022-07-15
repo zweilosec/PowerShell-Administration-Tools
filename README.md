@@ -6,7 +6,7 @@ description: >-
 
 # PowerShell Administration Tools
 
-PowerShell scripts for automating common system administration tasks.  Suggestions, submissions, updates, and requests are always welcome!
+PowerShell scripts for automating common system administration/ digital forensics tasks.  Suggestions, submissions, updates, and requests are always welcome!
 
 | Script Name | Description |
 | :--- | :--- |
@@ -17,6 +17,8 @@ PowerShell scripts for automating common system administration tasks.  Suggestio
 | [Locate-UserProfile](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Locate-UserProfile.ps1) | Searches a domain for the user ID specified.  Returns a list of all of the computers that user has signed into, their $home folder, and the last time they logged in. Saves output in a CSV file. |
 | [Add-RemotePrinter](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Add-RemotePrinter.ps1) | Adds a printer to the computer specified \(by computer name\).  Requires some information such as printer IP, Driver long name, and the name you want the printer to be displayed as. |
 | [Get-SoftwareInventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-SoftwareInventory.ps1) | Outputs a list of software installed on the target computer from the registry. Lists ComputerName, Software DisplayName, Version, and Publisher. |
+| [New-Shortcut](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/New-Shortcut.ps1) | Creates a new shortcut (.lnk) file with the specified properties. |
+| [Get-ShortcutProperties](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-ShortcutProperties.ps1) | Get the properties of the specified shortcut (.lnk) file |
 
 ## Network Tools
 | Script Name | Description |
