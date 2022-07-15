@@ -20,6 +20,7 @@ function Get-ShortcutProperties
         Description  : Create a new textfile on startup
         Attributes   : -a-h-
         Hotkey       :
+        RunAsAdmin   : False
     .NOTES
         Author: Beery, Christopher (https://github.com/zweilosec)
         Created: 15 Jul 2022
@@ -35,13 +36,21 @@ function Get-ShortcutProperties
     
         begin 
         {
-            Write-Verbose -Message "Starting [$($MyInvocation.Mycommand)]"
             $obj = New-Object -ComObject WScript.Shell
+
+            function ConvertDecimaltoBinary
+            {
+                param($in)
+                         
+                    [string]$a += [convert]::ToString([int32]$in,2)
+                    return $a                
+            }
         }
     
         process 
         {
-            if (Test-Path -Path $Path) {
+            if (Test-Path -Path $Path) 
+            {
                 $ResolveFile = Resolve-Path -Path $Path
                 if ($ResolveFile.count -gt 1) 
                 {
@@ -55,6 +64,20 @@ function Get-ShortcutProperties
                     if ($ResolveFile.Extension -eq '.lnk') 
                     {
                         $link = $obj.CreateShortcut($ResolveFile.FullName)
+
+                        Write-Verbose -Message "Testing if the shortcut runs as admin"
+                        $AdminTest = [System.IO.File]::ReadAllBytes($Path)[0x15]
+                        $binAdminTest = ConvertDecimaltoBinary -in $AdminTest
+                        if ($binAdminTest.substring(1,1) -eq '1')
+                        {
+                            $AsAdmin = $True
+                        }
+                        else 
+                        {
+                            $AsAdmin = $False
+                        }
+                        Write-Verbose "AsAdmin is $AsAdmin"
+                        Write-Verbose "AdminTest is $binAdminTest"
   
                         $info = [PSCustomObject]@{
                             
@@ -63,26 +86,24 @@ function Get-ShortcutProperties
                             Arguments = $link.Arguments                            
                             LinkName = $(try { Split-Path -Path $link.FullName -Leaf } catch { '' })
                             LinkPath = $(try { Split-Path -Path $link.FullName } catch { '' })
-                            WindowStyle = $link.WindowStyle
+                            WindowStyle = $(Switch ($link.WindowStyle)
+                                {
+                                    7 {"Minimized (7)"}
+                                    3 {"Maximized (3)"}
+                                    1 {"Default (1)"}
+                                })
                             IconLocation = $link.IconLocation
                             Description = $link.Description
                             Attributes = $((Get-ItemProperty $Path).Mode)                            
                             Hotkey = $link.Hotkey
-                        }
-
-                        #Convert WindowStyle integer to descriptive name
-                        Switch ($link.WindowStyle)
-                        {
-                            7 {$info.WindowStyle = "Minimized (7)"}
-                            3 {$info.WindowStyle = "Maximized (3)"}
-                            1 {$info.WindowStyle = "Default (1)"}
+                            RunAsAdmin = $AsAdmin
                         }
 
                         Write-Output $info
                     } 
                     else 
                     {
-                        Write-Error -Message 'ERROR: Extension is not .lnk'
+                        Write-Error -Message 'File xtension is not .lnk'
                     }
                 }
             } 
@@ -90,10 +111,5 @@ function Get-ShortcutProperties
             {
                 Write-Error -Message "ERROR: File [$Path] does not exist"
             }
-        }
-    
-        end 
-        {
-            Write-Verbose -Message "[$($MyInvocation.Mycommand)] evaluation complete"
         }
     }
