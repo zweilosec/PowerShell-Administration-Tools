@@ -6,6 +6,8 @@ Function Get-Inventory
 .DESCRIPTION
    Script for gathering ComputerName, Serial Number, Current User, Manufacturer, Model, MAC Address, Compliance Status, and IP Address from a list of computers.  
    An optional Microsoft patch KB name can be specified to check for update compliance.
+   Requires the WinRM service to be running on each remote computer, however works locally without.
+   To scan a remote machine without WinRM, use the -DCOM flag.
 .EXAMPLE
   Get-ComputerInventoryToCSV.ps1 -ComputerName Example-Comp1 -ComplianceKB KB4534276 -Verbose
 .EXAMPLE
@@ -38,7 +40,7 @@ Function Get-Inventory
 .NOTES
   Authors: Beery, Christopher (https://github.com/zweilosec) & Winchester, Cassius (https://github.com/cassiuswinchester)
   Created: 6 Mar 2020
-  Last Modified: 21 Jan 2022
+  Last Modified: 27 Jul 2022
 .FUNCTIONALITY
    Computer inventory enumeration tool
 #>
@@ -59,7 +61,10 @@ Param
     #Specific patch to check for compliance. Use Microsoft's KB number.
     #Default is "None Specified"
     [string]
-    $ComplianceKB = "None Specified"
+    $ComplianceKB = "None Specified", 
+ 
+    [Switch]
+    $DCOM = $false
 )
 
 #Check to make sure the user specified a ComputerName to scan, then print usage if not
@@ -97,23 +102,50 @@ Process {
 
             Write-Verbose "Beginning scan of $Computer"
 
+             #Parameter list that will be fed to Get-CimInstance
+            $CimParameters = @{}
+            #Hack to get around setting $Computer to $null if scanning localhost
+            $RemoteComputer = $Computer
+
+            #First, check if we are scanning the local machine
+            #Setting the -ComputerName property of Get-CIMInstance to $null will allow you 
+            # to scan a local machine without WinRM enabled
+            if ( $Computer -eq $($env:COMPUTERNAME) )
+            {
+                $RemoteComputer = $null
+            }
+
+            #If the user wants to use DCOM instead of WinRM, enable this
+            #Do not use this branch if scanning local computer because will cause errors and not needed
+            if ( $DCOM -and $RemoteComputer )
+            {
+                $SessionOption = New-CimSessionOption -Protocol Dcom
+                #Create the remote CIM session and add to CimParameters
+                $RemoteSession = New-CimSession -ComputerName $RemoteComputer -SessionOption $SessionOption
+                $CimParameters = @{CimSession = $RemoteSession}
+            }
+            else 
+            {
+                $CimParameters = @{ComputerName = $RemoteComputer}
+            }
+
             #Get Serial Number
-            $Serial = Get-CimInstance -ComputerName $Computer -Class Win32_BIOS | 
+            $Serial = Get-CimInstance -Class Win32_BIOS @CimParameters | 
             Select-Object -ExpandProperty SerialNumber
 
             #Get Current or last logged in username
-            $CurrentUser = Get-CimInstance -ComputerName $Computer -Class Win32_ComputerSystem -Property UserName  |
+            $CurrentUser = Get-CimInstance -Class Win32_ComputerSystem @CimParameters -Property UserName  |
             Select-Object -ExpandProperty UserName
 
             #Get list of network adapters
-            $IPConfigSet = Get-CimInstance -ComputerName $Computer -Class Win32_NetworkAdapterConfiguration -Filter "IPEnabled='True'"
+            $IPConfigSet = Get-CimInstance -Class Win32_NetworkAdapterConfiguration  @CimParameters -Filter "IPEnabled='True'"
 
             #Get Model of the PC
-            $Model = Get-CimInstance -ComputerName $Computer -Class Win32_ComputerSystem -Property Model |             
+            $Model = Get-CimInstance -Class Win32_ComputerSystem @CimParameters -Property Model   |             
             Select-Object -ExpandProperty Model
 
             #Get Manufacturer of the PC
-            $Manufacturer = Get-CimInstance -ComputerName $Computer -Class Win32_ComputerSystem -Property Manufacturer |             
+            $Manufacturer = Get-CimInstance -Class Win32_ComputerSystem  @CimParameters -Property Manufacturer |             
             Select-Object -ExpandProperty Manufacturer
 
             #Get MAC address of the PC
