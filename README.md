@@ -19,6 +19,7 @@ PowerShell scripts for automating common system administration/ digital forensic
 | [Get-SoftwareInventory](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-SoftwareInventory.ps1) | Outputs a list of software installed on the target computer from the registry. Lists ComputerName, Software DisplayName, Version, and Publisher. |
 | [New-Shortcut](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/New-Shortcut.ps1) | Creates a new shortcut (.lnk) file with the specified properties. |
 | [Get-ShortcutProperties](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Get-ShortcutProperties.ps1) | Get the properties of the specified shortcut (.lnk) file |
+| [Create-IsoWithLnk](https://github.com/zweilosec/PowerShell-Administration-Tools/blob/master/Create-IsoWithLnk.ps1) | A fun attempt at creating an offensive tool. This one creates a .lnk file, and autostart.inf file that links to the .lnk, and an ISO that contains them both. In a vulnerable system this might be able to autorun something (non-malicious of course!) All of this wrapped up in a nice little GUI form! |
 
 ## Network Tools
 | Script Name | Description |
