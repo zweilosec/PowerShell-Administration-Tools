@@ -205,17 +205,6 @@ function New-Shortcut
    $ShortCut.Description = $Description
    $ShortCut.Hotkey = $Hotkey
 
-   <#
-   if ($(Test-Path $OutputLink)) #If the .lnk already exists
-   {
-      Write-Output "The target link already exists."
-      $DeleteLink = Read-Host "Delete the existing link? [y/n]: "
-      if ($DeleteLink.ToLower() -eq 'y')
-      {
-         Remove-Item $OutputLink
-      }
-   }
-   #>
    $Shortcut.Save()
 
    # Optional if you want to make the link hidden (to prevent user clicks)
@@ -265,7 +254,6 @@ $form.Text = "ISO Creator"
 $form.Size = New-Object System.Drawing.Size(600, 400)
 
 #Change the Font for the headers to bold
-
 $LabelFont = [System.Drawing.Font]::new("Microsoft Sans Serif", 12, [System.Drawing.FontStyle]::Bold)
 
 # Create a label for the ISO section
@@ -456,9 +444,6 @@ $setAutostartButton.Add_Click({
 })
 $form.Controls.Add($setAutostartButton)
 
-#missing code here
-
-#The missing code needed is a button to close the form. 
 # Create a button to close the form
 $closeButton = New-Object System.Windows.Forms.Button
 $closeButton.Location = New-Object System.Drawing.Point(420, 330)
