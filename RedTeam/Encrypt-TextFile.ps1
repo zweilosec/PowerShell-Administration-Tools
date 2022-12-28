@@ -36,12 +36,12 @@ function Encrypt-File
 #>
     param(
         [Parameter(Mandatory=$true)]
-        [String]$Path, 
-
+        [String]$Path,
+        [String]$key = "usemetodecryptit",
         [Switch]$UTF8
         )
         
-    $key = (New-Object System.Text.ASCIIEncoding).GetBytes("usemetodecryptit")
+    $key = (New-Object System.Text.ASCIIEncoding).GetBytes($key)
     $securestring = new-object System.Security.SecureString
 
     #Use the -UTF8 flag if your input file is UTF-8 encoded!
